@@ -30,8 +30,6 @@ namespace SetupAppUtil.ConsoleApp
 
         private static void RunSetup()
         {
-            // Testing
-            // Directory.SetCurrentDirectory(@"\\smiths.net\dfs\Work\Flex-Tek\STUT\Installs\TutcoTools\PdfMark");
             var destRootDir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "Apps");
 
             var configFilePath = "setup.config";
@@ -42,11 +40,23 @@ namespace SetupAppUtil.ConsoleApp
                 destRootDir = configArgs[0];
             }
 
+            // Dest Dir
+            var dir = Directory.GetDirectories(Directory.GetCurrentDirectory()).First();
+            var destDir = Path.Combine(destRootDir, new DirectoryInfo(dir).Name);
+
+            // Move Existing Folder
+            Console.WriteLine("Removing Existing Version...");
+
+            if (Directory.Exists(destDir))
+            {
+                // Try to move existing to temp folder (where it can be auto deleted by OS)
+                var tempPathDir = Path.Combine(Path.GetTempPath(), new DirectoryInfo(dir).Name);
+                Directory.Move(destRootDir, tempPathDir);
+            }
+
             // Copy Files
             Console.WriteLine("Copying Files...");
 
-            var dir = Directory.GetDirectories(Directory.GetCurrentDirectory()).First();
-            var destDir = Path.Combine(destRootDir, new DirectoryInfo(dir).Name);
             var files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
 
             Directory.CreateDirectory(destDir);
