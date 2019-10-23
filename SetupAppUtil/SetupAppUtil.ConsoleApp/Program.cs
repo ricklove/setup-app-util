@@ -54,14 +54,11 @@ namespace SetupAppUtil.ConsoleApp
             var dir = Directory.GetDirectories(Directory.GetCurrentDirectory()).First();
             var destDir = Path.Combine(destRootDir, new DirectoryInfo(dir).Name);
 
-            // Move Existing Folder
-            Console.WriteLine("Removing Existing Version...");
-
+            // Task Kill (Warning: this will kill any task with a matching .exe filename)
             if (Directory.Exists(destDir))
             {
-                // Try to move existing to temp folder (where it can be auto deleted by OS)
-                var tempPathDir = Path.Combine(Path.GetTempPath(), new DirectoryInfo(dir).Name);
-                Directory.Move(destRootDir, tempPathDir);
+                var appExeImageName = Path.GetFileName(Directory.GetFiles(destDir, "*.exe").First());
+                System.Diagnostics.Process.Start("taskkill", $"/F /IM \"{appExeImageName}\"");
             }
 
             // Copy Files
