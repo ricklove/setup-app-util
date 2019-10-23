@@ -31,13 +31,23 @@ namespace SetupAppUtil.ConsoleApp
         private static void RunSetup()
         {
             var destRootDir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "Apps");
+            var beforeRun = "";
 
             var configFilePath = "setup.config";
             if (File.Exists(configFilePath))
             {
                 var configDoc = File.ReadAllText(configFilePath);
                 var configArgs = configDoc.Split('\n').Select(x => x.Trim()).ToList();
-                destRootDir = configArgs[0];
+                destRootDir = configArgs.Where(x => x.StartsWith("DEST=")).Select(x => x.Substring(5).Trim()).FirstOrDefault() ?? destRootDir;
+                beforeRun = configArgs.Where(x => x.StartsWith("BEFORE=")).Select(x => x.Substring(7).Trim()).FirstOrDefault() ?? destRootDir;
+            }
+
+            // Before run
+            if (!string.IsNullOrEmpty(beforeRun))
+            {
+                var proc = new System.Diagnostics.ProcessStartInfo() { FileName = "cmd.exe", Arguments = "/c " + beforeRun, UseShellExecute = false };
+                var p = System.Diagnostics.Process.Start(proc);
+                p.WaitForExit();
             }
 
             // Dest Dir
