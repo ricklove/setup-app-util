@@ -17,6 +17,7 @@ namespace SetupAppUtil.Logic
         private static void Log(string message) => LogProvider(message);
 
         public static bool IsUpdater => Process.GetCurrentProcess().MainModule.FileName.EndsWith(UPDATE_EXE_NAME, StringComparison.InvariantCultureIgnoreCase);
+        public static Action HasUpdateCallback = () => { };
 
         public static async Task Run()
         {
@@ -95,6 +96,11 @@ namespace SetupAppUtil.Logic
                     {
                         Log("Already Up to Date...");
                         return;
+                    }
+
+                    if (isUpdater)
+                    {
+                        HasUpdateCallback();
                     }
 
                     Log("Closing Running Program...");

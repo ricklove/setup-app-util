@@ -1,4 +1,5 @@
 ﻿using SetupAppUtil.Logic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -13,15 +14,28 @@ namespace SetupAppUtil.WpfApp
         {
             InitializeComponent();
 
-            if (MainLogic.IsUpdater)
+            WindowState = WindowState.Minimized;
+            Hide();
+
+            if (System.Environment.GetCommandLineArgs().Any(x => x.EndsWith("headless", System.StringComparison.InvariantCultureIgnoreCase)))
             {
-                // WindowState = WindowState.Normal;
+               // Keep hidden
+            }
+            else if (MainLogic.IsUpdater)
+            {
                 Title = "Checking for Updates...";
+                MainLogic.HasUpdateCallback = () => Dispatcher.Invoke(() =>
+                {
+                    Title = "Updating Program...";
+                    WindowState = WindowState.Normal;
+                    Show();
+                });
             }
             else
             {
                 WindowState = WindowState.Normal;
                 Title = "Installing Program...";
+                Show();
             }
 
             Run();
